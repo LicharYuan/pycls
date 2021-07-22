@@ -19,6 +19,8 @@ import pycls.models.scaler as scaler
 from pycls.core.config import cfg
 
 from NasPred.query.custom_query import CustomServer
+import numpy as np
+# from NasPred.archEncoder.custom_enc import CustomEncoder
 
 def parse_args():
     """Parse command line options (mode and config)."""
@@ -27,6 +29,7 @@ def parse_args():
     parser.add_argument("--mode", help=help_s, choices=choices, required=True, type=str)
     help_s = "Config file location"
     parser.add_argument("--cfg", help=help_s, required=True, type=str)
+    parser.add_argument("--net", help="sample net", required=True, type=str)
     help_s = "See pycls/core/config.py for all options"
     parser.add_argument("opts", help=help_s, default=None, nargs=argparse.REMAINDER)
     if len(sys.argv) == 1:
@@ -35,12 +38,34 @@ def parse_args():
     return parser.parse_args()
 
 
+def parse_net(net):
+    net_list = [eval(ele) for ele in net.split("_")]
+    depths = net_list[:4]
+    widths = net_list[4:8]
+    bot_mults = net_list[8:12]
+    groups = net_list[12:16]
+    groups_ws = np.array(widths) * np.array(bot_mults) // np.array(groups)
+    groups_ws = groups_ws.tolist()
+    new_net = {
+        "DEPTHS": depths,
+        "WIDTHS": widths,
+        "BOT_MULS": bot_mults,
+        "GROUP_WS": groups_ws,
+    }
+    return new_net
+
+
 def main():
     """Execute operation (train, test, time, etc.)."""
     args = parse_args()
     mode = args.mode
     config.load_cfg(args.cfg)
     cfg.merge_from_list(args.opts)
+
+    # update new net
+    new_net = parse_net(args.net)
+    cfg["ANYNET"].update(new_net)
+
     config.assert_cfg()
     cfg.freeze()
     if mode == "info":
