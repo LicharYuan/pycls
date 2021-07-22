@@ -154,6 +154,7 @@ def test_epoch(loader, model, meter, cur_epoch):
         meter.iter_tic()
     # Log epoch stats
     meter.log_epoch_stats(cur_epoch)
+    meter.save_to_query(cur_epoch, cfg.QUERY_FILE)
 
 
 def train_model():

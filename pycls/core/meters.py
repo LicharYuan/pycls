@@ -15,6 +15,7 @@ import torch
 from pycls.core.config import cfg
 from pycls.core.timer import Timer
 
+from NasPred.utils import save_json, load_json
 
 logger = logging.get_logger(__name__)
 
@@ -258,3 +259,11 @@ class TestMeter(object):
     def log_epoch_stats(self, cur_epoch):
         stats = self.get_epoch_stats(cur_epoch)
         logger.info(logging.dump_log_data(stats, self.phase + "_epoch"))
+    
+    def save_to_query(self, cur_epoch, query_file):
+        # add for remote query 
+        ori_query = load_json(query_file)
+        ori_query[cfg.NET_STR] = {}
+        stats = self.get_epoch_stats(cur_epoch)
+        ori_query[cfg.NET_STR].update({str(cur_epoch): stats})
+        save_json(query_file, ori_query)
