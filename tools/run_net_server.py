@@ -19,6 +19,8 @@ import pycls.models.scaler as scaler
 from pycls.core.config import cfg
 
 from NasPred.query.custom_query import CustomServer
+from NasPred.utils import save_json, load_json
+
 import numpy as np
 import copy
 import math
@@ -114,9 +116,22 @@ def main():
 
     # update new net
     new_net, net_list = parse_net(args.net)
+
     cfg["ANYNET"].update(new_net)
-    cfg["NET_STR"] = "_".join(str(ele) for ele in net_list)
-    cfg["QUERY_FILE"] = args.query_file
+    cfg["NET_POST"] = "_".join(str(ele) for ele in net_list)
+    cfg["NET_ORI"] = args.net.strip()
+    cfg["QUERY_FILE"] = args.query_file.strip()
+    query_data = load_json(args.query_file)
+    print(query_data)
+    
+    # TODO: mv post-process in sampler!
+    if cfg["NET_POST"] in query_data.keys():
+        # two net match same net after post-process
+        query_data[args.net] = query_data[cfg["NET_POST"]]
+        exit("two net match same net after post-process")
+    
+
+        
     
     config.assert_cfg()
     cfg.freeze()

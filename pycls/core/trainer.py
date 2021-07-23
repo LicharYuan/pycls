@@ -27,6 +27,9 @@ import torch.cuda.amp as amp
 from pycls.core.config import cfg
 from pycls.core.io import cache_url, pathmgr
 
+from NasPred.utils import save_json, load_json, load_pkl, save_pkl
+from multiprocessing import Lock
+
 
 logger = logging.get_logger(__name__)
 
@@ -154,7 +157,11 @@ def test_epoch(loader, model, meter, cur_epoch):
         meter.iter_tic()
     # Log epoch stats
     meter.log_epoch_stats(cur_epoch)
-    meter.save_to_query(cur_epoch, cfg.QUERY_FILE)
+    if dist.is_master_proc():
+        meter.save_to_query(cur_epoch, cfg.QUERY_FILE)
+        
+    return meter.get_epoch_stats(cur_epoch)
+
 
 
 def train_model():
@@ -222,7 +229,12 @@ def test_model():
     test_loader = data_loader.construct_test_loader()
     test_meter = meters.TestMeter(len(test_loader))
     # Evaluate the model
-    test_epoch(test_loader, model, test_meter, 0)
+    cur_stat = test_epoch(test_loader, model, test_meter, 0)
+
+    # ori_query = load_json(cfg.QUERY_FILE)
+    # ori_query[cfg.NET_ORI] = {}
+    # ori_query[cfg.NET_ORI] =  cur_stat
+    # save_json(cfg.QUERY_FILE, ori_query)
 
 
 def time_model():

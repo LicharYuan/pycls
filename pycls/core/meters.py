@@ -8,14 +8,15 @@
 """Meters."""
 
 from collections import deque
-
 import numpy as np
 import pycls.core.logging as logging
 import torch
 from pycls.core.config import cfg
 from pycls.core.timer import Timer
 
-from NasPred.utils import save_json, load_json
+from NasPred.utils import save_json, load_json, load_pkl, save_pkl
+from multiprocessing import Lock
+import os
 
 logger = logging.get_logger(__name__)
 
@@ -259,11 +260,18 @@ class TestMeter(object):
     def log_epoch_stats(self, cur_epoch):
         stats = self.get_epoch_stats(cur_epoch)
         logger.info(logging.dump_log_data(stats, self.phase + "_epoch"))
+
     
     def save_to_query(self, cur_epoch, query_file):
         # add for remote query 
+        
+        # lock.acquire() # use master process to save, no need for lock
         ori_query = load_json(query_file)
-        ori_query[cfg.NET_STR] = {}
+        # lock.release()
+        if cfg.NET_ORI not in ori_query.keys():    
+            ori_query[cfg.NET_ORI] = {}
+        
         stats = self.get_epoch_stats(cur_epoch)
-        ori_query[cfg.NET_STR].update({str(cur_epoch): stats})
+        ori_query[cfg.NET_ORI][str(cur_epoch)] =  stats
+
         save_json(query_file, ori_query)
