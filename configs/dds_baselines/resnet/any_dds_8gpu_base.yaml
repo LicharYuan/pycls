@@ -16,14 +16,15 @@ ANYNET:
   # group_ws = w_out * bot_muls // groups 
 OPTIM:
   LR_POLICY: cos
-  BASE_LR: 0.8
+  BASE_LR: 0.4 # /2
   MAX_EPOCH: 10
   MOMENTUM: 0.9
   WEIGHT_DECAY: 5e-5
 TRAIN:
   DATASET: imagenet
   IM_SIZE: 224
-  BATCH_SIZE: 1024
+  BATCH_SIZE: 512 # Paper used v100 16G 1024. But We only have 2080Ti 11G 
+  MIXED_PRECISION: True
 TEST:
   DATASET: imagenet
   IM_SIZE: 256

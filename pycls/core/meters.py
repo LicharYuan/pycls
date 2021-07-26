@@ -268,6 +268,8 @@ class TestMeter(object):
         # lock.acquire() # use master process to save, no need for lock
         ori_query = load_json(query_file)
         # lock.release()
+        
+        # FIXME: Here should be `NET_POST` as save key
         if cfg.NET_ORI not in ori_query.keys():    
             ori_query[cfg.NET_ORI] = {}
         

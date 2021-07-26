@@ -19,23 +19,20 @@ import pycls.models.scaler as scaler
 from pycls.core.config import cfg
 
 from NasPred.query.custom_query import CustomServer
-from NasPred.utils import save_json, load_json
+from NasPred.utils import save_json, load_json, load_pkl, save_pkl
 
 import numpy as np
 import copy
 import math
-import time
 # from NasPred.archEncoder.custom_enc import CustomEncoder
 
 def parse_args():
     """Parse command line options (mode and config)."""
     parser = argparse.ArgumentParser(description="Run a model.")
-    help_s, choices = "Run mode", ["info", "train", "test", "time", "scale"]
-    parser.add_argument("--mode", help=help_s, choices=choices, required=True, type=str)
+
     help_s = "Config file location"
     parser.add_argument("--cfg", help=help_s, required=True, type=str)
-    parser.add_argument("--net", help="sample net", required=True, type=str)
-    parser.add_argument("--query_file", help="query file for remote", required=True, type=str)
+    parser.add_argument("--pkl", help="sample net pkl", required=True, type=str)
     help_s = "See pycls/core/config.py for all options"
     parser.add_argument("opts", help=help_s, default=None, nargs=argparse.REMAINDER)
     if len(sys.argv) == 1:
@@ -77,7 +74,6 @@ def match_divs(alist, nums_list, metric="abs"):
     return res
 
 
-
 def parse_net(net):
     net_list = [eval(ele) for ele in net.strip().split("_")]
     depths = net_list[:4]
@@ -111,60 +107,36 @@ def parse_net(net):
 def main():
     """Execute operation (train, test, time, etc.)."""
     args = parse_args()
-    mode = args.mode
     config.load_cfg(args.cfg)
     cfg.merge_from_list(args.opts)
 
     # update new net
-    new_net, net_list = parse_net(args.net)
+    ori_pkl = load_pkl(args.pkl)
+    post_process = {} # get post net 
 
-    cfg["ANYNET"].update(new_net)
-    cfg["NET_POST"] = "_".join(str(ele) for ele in net_list)
-    cfg["NET_ORI"] = args.net.strip()
-    cfg["QUERY_FILE"] = args.query_file.strip()
-    query_data = load_json(args.query_file)
-    
-    # TODO: mv post-process in sampler! 
-    # 有一种采样case, 两个网络对应同一个后处理的结构 会重复处理, 但是概率比较低
-    # 处理方式, 在query_file把后处理的的网络加进去, 作为flag. 当前未添加.
-    
-    config.assert_cfg()
-    cfg.freeze()
-    if mode == "info":
-        # print(builders.get_model()())
-        comp = net.complexity(builders.get_model())
-        stand_comp = {}
-        for key, value in comp.items():
-            if key == "flops":
-                stand_comp[key] = value / 1e9
-            elif key == "params":
-                stand_comp[key] = value / 1e6
-            elif key == "acts":
-                stand_comp[key] = value / 1e6
+    for key in ori_pkl.keys():
+        args.net = key
+        new_net, net_list = parse_net(args.net)
+        new_net_str = "_".join(str(ele) for ele in net_list)
+        post_process[new_net_str] = ori_pkl[key]
 
-        net_info = {"complexity": stand_comp}
-        print(net_info)
-        query_data[args.net.strip()] = net_info 
-        save_json(args.query_file, query_data)
-        time.sleep(1)
+        cfg["ANYNET"].update(new_net)
+        print(cfg)
+            
+        config.assert_cfg()
+        cfg.freeze()
 
-    elif mode == "train":
-        dist.multi_proc_run(num_proc=cfg.NUM_GPUS, fun=trainer.train_model)
-    elif mode == "test":
-        dist.multi_proc_run(num_proc=cfg.NUM_GPUS, fun=trainer.test_model)
-    elif mode == "time":
-        dist.multi_proc_run(num_proc=cfg.NUM_GPUS, fun=trainer.time_model)
-    elif mode == "scale":
-        cfg.defrost()
-        cx_orig = net.complexity(builders.get_model())
-        scaler.scale_model()
-        cx_scaled = net.complexity(builders.get_model())
-        cfg_file = config.dump_cfg()
-        print("Scaled config dumped to:", cfg_file)
-        print("Original model complexity:", cx_orig)
-        print("Scaled model complexity:", cx_scaled)
+        builders.get_model()()
+
+        complexity = {"complexity" : net.complexity(builders.get_model())}
+        print(complexity)
+
+        post_process[new_net_str].update(complexity)
+
+    save_pkl("./post_bench.pkl", post_process)
 
 
 
 if __name__ == "__main__":
     main()
+    # todo: rm dirty works after experiments
