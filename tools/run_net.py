@@ -42,6 +42,8 @@ def main():
     cfg.merge_from_list(args.opts)
     config.assert_cfg()
     cfg.freeze()
+    # print(cfg.get("QUERY_FILE"), "!!!")
+
     if mode == "info":
         print(builders.get_model()())
         print("complexity:", net.complexity(builders.get_model()))

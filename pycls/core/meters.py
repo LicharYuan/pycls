@@ -264,16 +264,12 @@ class TestMeter(object):
     
     def save_to_query(self, cur_epoch, query_file):
         # add for remote query 
-        
-        # lock.acquire() # use master process to save, no need for lock
         ori_query = load_json(query_file)
-        # lock.release()
-        
-        # FIXME: Here should be `NET_POST` as save key
         if cfg.NET_ORI not in ori_query.keys():    
             ori_query[cfg.NET_ORI] = {}
-        
+        # NOTE: IN dirty tools, should add phase.
         stats = self.get_epoch_stats(cur_epoch)
-        ori_query[cfg.NET_ORI][str(cur_epoch)] =  stats
+        ori_query[cfg.NET_ORI][str(cur_epoch)] = {}
+        ori_query[cfg.NET_ORI][str(cur_epoch)][self.phase] =  stats
 
         save_json(query_file, ori_query)

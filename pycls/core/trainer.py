@@ -158,8 +158,9 @@ def test_epoch(loader, model, meter, cur_epoch):
     # Log epoch stats
     meter.log_epoch_stats(cur_epoch)
     if dist.is_master_proc():
-        meter.save_to_query(cur_epoch, cfg.QUERY_FILE)
-        
+        if cfg.get("QUERY_FILE"):
+            meter.save_to_query(cur_epoch, cfg.QUERY_FILE)
+
     return meter.get_epoch_stats(cur_epoch)
 
 
@@ -203,6 +204,7 @@ def train_model():
         train_epoch(*params, cur_epoch)
         # Compute precise BN stats
         if cfg.BN.USE_PRECISE_STATS:
+            # default True in config
             net.compute_precise_bn_stats(model, train_loader)
             net.compute_precise_bn_stats(ema, train_loader)
         # Evaluate the model
