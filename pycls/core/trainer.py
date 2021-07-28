@@ -66,6 +66,14 @@ def setup_model():
     logger.info("Model:\n{}".format(model)) if cfg.VERBOSE else ()
     # Log model complexity
     logger.info(logging.dump_log_data(net.complexity(model), "complexity"))
+
+    # save complexity
+    if dist.is_master_proc():
+        if cfg.get("QUERY_FILE"):
+            query_data = load_json(cfg.QUERY_FILE)
+            query_data[cfg.NET_ORI].update({"complexity": net.complexity(model)})
+            save_json(cfg.QUERY_FILE, query_data)
+
     # Transfer the model to the current GPU device
     cur_device = torch.cuda.current_device()
     model = model.cuda(device=cur_device)
