@@ -131,7 +131,7 @@ def main():
     config.assert_cfg()
     cfg.freeze()
     if mode == "info":
-        # print(builders.get_model()())
+        print(builders.get_model()())
         comp = net.complexity(builders.get_model())
         stand_comp = {}
         for key, value in comp.items():

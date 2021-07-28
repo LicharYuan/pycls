@@ -29,3 +29,7 @@ pycls/datasets/data/
 logs/
 scratch*
 ts/
+
+# debug info
+*.json
+*.log

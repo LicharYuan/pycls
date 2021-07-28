@@ -6,6 +6,7 @@
 # - STEM_W
 # - STRIDES
 # - WARMUP_EPOCHS
+# Pass Test On regnet-800MF/1.6GF
 
 MODEL:
   TYPE: anynet

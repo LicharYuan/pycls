@@ -270,6 +270,6 @@ class TestMeter(object):
         # NOTE: IN dirty tools, should add phase.
         stats = self.get_epoch_stats(cur_epoch)
         ori_query[cfg.NET_ORI][str(cur_epoch)] = {}
-        ori_query[cfg.NET_ORI][str(cur_epoch)][self.phase] =  stats
+        ori_query[cfg.NET_ORI][str(cur_epoch)].update({self.phase:stats})
 
         save_json(query_file, ori_query)
