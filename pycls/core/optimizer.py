@@ -112,11 +112,27 @@ def get_epoch_lr(cur_epoch):
     # Get lr and scale by by BASE_LR
     lr = get_lr_fun()(cur_epoch) * cfg.OPTIM.BASE_LR
     # Linear warmup
+
     if cur_epoch < cfg.OPTIM.WARMUP_EPOCHS:
         alpha = cur_epoch / cfg.OPTIM.WARMUP_EPOCHS
         warmup_factor = cfg.OPTIM.WARMUP_FACTOR * (1.0 - alpha) + alpha
         lr *= warmup_factor
     return lr
+
+def get_iter_lr(cur_epoch, cur_iter, epoch_iter):
+    """Update Lr Per Iter"""
+    lr = get_lr_fun()(cur_epoch) * cfg.OPTIM.BASE_LR
+    # Iter Linear warmup
+    _iter = cur_iter + cur_epoch * epoch_iter
+    warmup_iter = cfg.OPTIM.WARMUP_EPOCHS * epoch_iter
+    # print(_iter, warmup_iter)
+    if _iter < warmup_iter: 
+        alpha = _iter / warmup_iter
+        warmup_factor = cfg.OPTIM.WARMUP_FACTOR * (1.0 - alpha) + alpha
+        # print(warmup_factor, lr)
+        lr *= warmup_factor
+    return lr
+
 
 
 def set_lr(optimizer, new_lr):

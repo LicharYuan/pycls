@@ -1,34 +1,33 @@
 # build for predictor
 # here we use regnet search space to sample
-
-## RETRAIN CONFIG
 MODEL:
   TYPE: anynet
   NUM_CLASSES: 1000
 ANYNET:
-  STEM_TYPE: simple_stem_in
-  STEM_W: 32
+  STEM_TYPE: res_stem_in
+  STEM_W: 64
   BLOCK_TYPE: res_bottleneck_block
-  STRIDES: [2, 2, 2, 2]
-  DEPTHS: [16, 16, 16, 16] #  search range 1-16
-  WIDTHS: [1024, 1024, 1024, 1024] # search range 1-8 part
-  BOT_MULS: [0.25, 0.25, 0.25, 0.25] # {1,2,4}
-  GROUP_WS: [64, 128, 256, 512] 
+  STRIDES: [1, 2, 2, 2]
+  DEPTHS: [1, 3, 7, 5] #  search range 1-16
+  WIDTHS: [ 64, 128, 288, 672] # search range 1-8 part
+  BOT_MULS: [1, 1, 1, 1] # {1,2,4}
+  GROUP_WS: [16, 16, 16, 16] 
   # group = w_out * bot_muls // group_ws # {1,2,...,32} sample group but convert 
   # group_ws = w_out * bot_muls // groups 
+
 OPTIM:
   LR_POLICY: cos
-  BASE_LR: 0.8 
-  MAX_EPOCH: 100
+  BASE_LR: 0.4 # /2
+  MAX_EPOCH: 10
   MOMENTUM: 0.9
-  WEIGHT_DECAY: 5e-5
+  WEIGHT_DECAY: 5e-5 
   WARMUP_EPOCHS: 5.0
-
 TRAIN:
   DATASET: imagenet
   IM_SIZE: 224
-  BATCH_SIZE: 1024 
-  MIXED_PRECISION: True # NOTE: ALL RETRAIN USED MIX_PRECISION, BUR REGNET SET FALSE
+  BATCH_SIZE: 1024 # Paper used v100 16G 1024. But We only have 2080Ti 11G 
+  MIXED_PRECISION: True
+  
 TEST:
   DATASET: imagenet
   IM_SIZE: 256

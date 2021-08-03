@@ -69,8 +69,12 @@ def setup_model():
 
     # save complexity
     if dist.is_master_proc():
+
         if cfg.get("QUERY_FILE"):
             query_data = load_json(cfg.QUERY_FILE)
+            if cfg.NET_ORI not in query_data.keys():    
+                query_data[cfg.NET_ORI] = {}
+
             query_data[cfg.NET_ORI].update({"complexity": net.complexity(model)})
             save_json(cfg.QUERY_FILE, query_data)
 
@@ -124,6 +128,12 @@ def train_epoch(loader, model, ema, loss_fun, optimizer, scaler, meter, cur_epoc
         scaler.update()
         # Update ema weights
         net.update_model_ema(model, ema, cur_epoch, cur_iter)
+
+        # Update Lr iter For warm up
+        if cfg.OPTIM.WARMUP_ITER:
+            lr = optim.get_iter_lr(cur_epoch, cur_iter, len(loader))
+            optim.set_lr(optimizer, lr)
+
         # Compute the errors
         top1_err, top5_err = meters.topk_errors(preds, labels, [1, 5])
         # Combine the stats across the GPUs (no reduction if 1 GPU used)

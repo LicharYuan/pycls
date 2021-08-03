@@ -135,6 +135,7 @@ class TrainMeter(object):
         cur_iter_total = cur_epoch * self.epoch_iters + cur_iter + 1
         eta_sec = self.iter_timer.average_time * (self.max_iter - cur_iter_total)
         mem_usage = gpu_mem_usage()
+        # only visualize +1
         stats = {
             "epoch": "{}/{}".format(cur_epoch + 1, cfg.OPTIM.MAX_EPOCH),
             "iter": "{}/{}".format(cur_iter + 1, self.epoch_iters),

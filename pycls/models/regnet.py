@@ -17,11 +17,11 @@ def generate_regnet(w_a, w_0, w_m, d, q=8):
     """Generates per stage widths and depths from RegNet parameters."""
     assert w_a >= 0 and w_0 > 0 and w_m > 1 and w_0 % q == 0
     # Generate continuous per-block ws
-    ws_cont = np.arange(d) * w_a + w_0
+    ws_cont = np.arange(d) * w_a + w_0 # eq.2 in paper
     # Generate quantized per-block ws
-    ks = np.round(np.log(ws_cont / w_0) / np.log(w_m))
-    ws_all = w_0 * np.power(w_m, ks)
-    ws_all = np.round(np.divide(ws_all, q)).astype(int) * q
+    ks = np.round(np.log(ws_cont / w_0) / np.log(w_m)) # s_j in paper, assign number block of stages
+    ws_all = w_0 * np.power(w_m, ks) # eq.4 in paper
+    ws_all = np.round(np.divide(ws_all, q)).astype(int) * q # using round to get Integer
     # Generate per stage ws and ds (assumes ws_all are sorted)
     ws, ds = np.unique(ws_all, return_counts=True)
     # Compute number of actual stages and total possible stages

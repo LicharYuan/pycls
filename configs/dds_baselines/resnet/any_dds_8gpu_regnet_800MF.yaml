@@ -17,28 +17,15 @@ ANYNET:
 
 OPTIM:
   LR_POLICY: cos
-  BASE_LR: 0.4 # /2
-  MAX_EPOCH: 10
+  BASE_LR: 0.8 # /2
+  MAX_EPOCH: 100
   MOMENTUM: 0.9
   WEIGHT_DECAY: 5e-5 
-
-  # 问题汇总
-  # a)
-  # 在build bench的时候发现, 有一些结构在base_lr = 0.4 的情况下, 训崩了
-  # 可加 warm-up epochs数, 来解决这个问题 . 
-  # b)
-  # regnet中用过采样500个模型来表示搜索空间的好坏, 
-  # 但是我们想要的是单个模型的好坏, 这其中应该怎么转换?
-  # 
-  # c) **
-  # bench setting有一些问题, 这里group的范围应该是 1,2,4,6,8,16,32
-  # widths 每份 范围是 1024/128
-  
-  
+  WARMUP_EPOCHS: 5.0
 TRAIN:
   DATASET: imagenet
   IM_SIZE: 224
-  BATCH_SIZE: 512 # Paper used v100 16G 1024. But We only have 2080Ti 11G 
+  BATCH_SIZE: 1024 # Paper used v100 16G 1024. But We only have 2080Ti 11G 
   MIXED_PRECISION: True
 TEST:
   DATASET: imagenet

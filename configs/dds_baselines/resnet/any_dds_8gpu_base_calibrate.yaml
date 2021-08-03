@@ -19,7 +19,7 @@ ANYNET:
   DEPTHS: [16, 16, 16, 16] #  search range 1-16
   WIDTHS: [1024, 1024, 1024, 1024] # search range 1-8 part
   BOT_MULS: [0.25, 0.25, 0.25, 0.25] # {1,2,4}
-  GROUP_WS: [64, 128, 256, 512] 
+  GROUP_WS: [64, 128, 256, 512] # 编码传的是group
   # group = w_out * bot_muls // group_ws # {1,2,...,32} sample group but convert 
   # group_ws = w_out * bot_muls // groups 
 
@@ -29,7 +29,9 @@ OPTIM:
   MAX_EPOCH: 10
   MOMENTUM: 0.9
   WEIGHT_DECAY: 5e-5 
-  WARMUP_EPOCHS: 5 # diff from sampling setting in regnet
+  WARMUP_EPOCHS: 0.5 # diff from sampling setting in regnet
+  WARMUP_ITER: True # iter linear warmup
+  WARMUP_FACTOR: 0.05
   
 TRAIN:
   DATASET: imagenet
