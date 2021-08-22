@@ -371,6 +371,7 @@ class AnyNet(Module):
     def forward(self, x):
         for module in self.children():
             x = module(x)
+            # print(x.shape)
         return x
 
     @staticmethod

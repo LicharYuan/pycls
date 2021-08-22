@@ -24,3 +24,9 @@ TEST:
   BATCH_SIZE: 800
 NUM_GPUS: 8
 OUT_DIR: .
+
+# 800MF: AnyNet: 
+#  width: [64, 128, 288, 672] 
+#  depth: [1, 3, 7, 5], 
+#  bot_mul=1, 
+#  groups: [4, 8, 18, 42]

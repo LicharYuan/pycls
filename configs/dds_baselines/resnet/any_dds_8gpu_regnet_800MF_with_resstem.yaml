@@ -4,6 +4,7 @@ MODEL:
   TYPE: anynet
   NUM_CLASSES: 1000
 ANYNET:
+  # STEM_TYPE: simple_stem_in
   STEM_TYPE: res_stem_in
   STEM_W: 64
   BLOCK_TYPE: res_bottleneck_block
@@ -17,8 +18,8 @@ ANYNET:
 
 OPTIM:
   LR_POLICY: cos
-  BASE_LR: 0.4 # /2
-  MAX_EPOCH: 10
+  BASE_LR: 0.8 # /2
+  MAX_EPOCH: 100
   MOMENTUM: 0.9
   WEIGHT_DECAY: 5e-5 
   WARMUP_EPOCHS: 5.0
@@ -27,10 +28,9 @@ TRAIN:
   IM_SIZE: 224
   BATCH_SIZE: 1024 # Paper used v100 16G 1024. But We only have 2080Ti 11G 
   MIXED_PRECISION: True
-  
 TEST:
   DATASET: imagenet
   IM_SIZE: 256
   BATCH_SIZE: 800
 NUM_GPUS: 8
-OUT_DIR: .
+OUT_DIR: ./ts/regnetx/800MF
