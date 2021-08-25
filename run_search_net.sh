@@ -2,12 +2,14 @@
 QUERY_FILE=$1
 NET=$2
 FLOPS=$3
+CONFIG=$4
 echo  $NET
 echo  $QUERY_FILE
+echo  $CONFIG
 echo "RUNNING TRAIN"
 ./tools/run_net_server.py --mode train \
                           --query_file $QUERY_FILE \
-                          --cfg configs/dds_baselines/resnet/any_dds_8gpu_full_base.yaml \
+                          --cfg ${CONFIG} \
                           --net $NET \
                           OUT_DIR ./ts/Search/calibirate/${NET}_${FLOPS}
 
