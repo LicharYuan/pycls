@@ -84,7 +84,8 @@ def parse_net(net):
     widths = net_list[4:8]
     bot_mults = net_list[8:12]
     bot_mults = (1 / np.array(bot_mults)).tolist()
-
+    # 如果输入 4, 在AnyNet中, 转成 1/4
+    
     groups = net_list[12:16]
 
     w_out = np.array(widths) * np.array(bot_mults) 
@@ -104,6 +105,7 @@ def parse_net(net):
         "BOT_MULS": bot_mults,
         "GROUP_WS": groups_ws,
     }
+    print(new_net)
 
     return new_net, net_list
 
@@ -123,6 +125,8 @@ def main():
     cfg["NET_ORI"] = args.net.strip()
     cfg["QUERY_FILE"] = args.query_file.strip()
     query_data = load_json(args.query_file)
+    if args.net.strip() in query_data.keys():
+        exit("ALREADY IN")
     
     # TODO: mv post-process in sampler! 
     # 有一种采样case, 两个网络对应同一个后处理的结构 会重复处理, 但是概率比较低
@@ -130,6 +134,8 @@ def main():
     
     config.assert_cfg()
     cfg.freeze()
+    print(cfg)
+
     if mode == "info":
         print(builders.get_model()())
         comp = net.complexity(builders.get_model())

@@ -11,8 +11,8 @@
 
 **>=3.2GF**
 
-``sh run_search_net.sh ./num30.json $NET$  $NET_FLOPS$  ./configs/dds_baselines/resnet/any_dds_8gpu_full_large_base.yaml`
-`
+`sh run_search_net.sh ./num30.json $NET$  $NET_FLOPS$  ./configs/dds_baselines/resnet/any_dds_8gpu_full_large_base.yaml`
+
 
 
 
