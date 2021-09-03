@@ -91,7 +91,7 @@ def setup_distributed(cfg_state):
     cfg.update(**cfg_state)
     cfg.freeze()
     local_rank = int(os.environ["LOCAL_RANK"])
-    print(os.environ)
+    # print(os.environ)
     torch.distributed.init_process_group(backend=cfg.DIST_BACKEND)
     torch.cuda.set_device(local_rank)
 

@@ -20,6 +20,7 @@ from pycls.core.config import cfg
 
 from NasPred.query.custom_query import CustomServer
 from NasPred.utils import save_json, load_json
+from pycls.utils.debug import *
 
 import numpy as np
 import copy
@@ -138,6 +139,7 @@ def main():
     if mode == "info":
         print(builders.get_model()())
         comp = net.complexity(builders.get_model())
+        print(get_model_complexity_info(builders.get_model()(), (3,224,224,)))
         stand_comp = {}
         for key, value in comp.items():
             if key == "flops":

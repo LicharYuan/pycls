@@ -14,6 +14,17 @@
 `sh run_search_net.sh ./num30.json $NET$  $NET_FLOPS$  ./configs/dds_baselines/resnet/any_dds_8gpu_full_large_base.yaml`
 
 
+## acc query
+
+### porxy
+`python run_server.py 10.10.81.182 --port 8002 --sc run_net.sh --qf ./itera2.json`
+
+
+### full 
+由于这里要根据 FLops选择不同的config, 且full的网络比较少, 暂时没写query
+
+
+
 
 
 
